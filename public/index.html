@@ -3,255 +3,252 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Әл-Фараби — Уикипедия стилі</title>
+    <title>Әл-Фараби — Энциклопедия (тарихи стиль)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-      /* Панель чата */
-      .chat-panel {
-        transition: transform 0.4s ease-in-out;
-      }
-      .chat-panel.closed {
-        transform: translateX(100%);
-      }
-
-      /* Инфобокс және уикипедия стилі */
-      .infobox th {
-        background: #f8f9fa;
-        font-weight: 600;
-      }
-      .infobox td,
-      .infobox th {
-        border: 1px solid #e5e7eb;
-        padding: 0.4rem 0.6rem;
-        vertical-align: top;
-      }
-      .toc a {
-        text-decoration: underline;
-      }
-      .mw hr {
-        border-color: #e5e7eb;
-        margin: 0.75rem 0 1rem;
-      }
-      .first-par {
-        font-size: 1.05rem;
+      /* ===== Историческая тема (без сборок) ===== */
+      :root{
+        --paper:#f7f3e8;          /* пергаментный фон */
+        --ink:#2b2a27;            /* “чернила” */
+        --sepia:#a68a64;          /* акцент */
+        --orn:#d2c7ad;            /* орнамент/границы */
       }
 
-      /* Фон при открытом чате */
-      #overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.4);
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.4s ease-in-out;
-        z-index: 30;
+      /* Пергаментный бокс */
+      .history-paper{
+        background:
+          radial-gradient(1200px 600px at 30% 10%, rgba(0,0,0,.03), transparent 60%),
+          radial-gradient(1000px 500px at 90% 80%, rgba(0,0,0,.025), transparent 55%),
+          repeating-linear-gradient(0deg, rgba(0,0,0,.012) 0 2px, rgba(255,255,255,.02) 2px 4px),
+          var(--paper);
+        color: var(--ink);
+        border: 1px solid var(--orn);
+        box-shadow:
+          0 8px 24px rgba(0,0,0,.08),
+          inset 0 1px 0 rgba(255,255,255,.5);
       }
-      #overlay.visible {
-        opacity: 1;
-        pointer-events: all;
+
+      /* Декоративная рамка сверху/снизу */
+      .history-frame{
+        position:relative;
       }
+      .history-frame:before,
+      .history-frame:after{
+        content:"";
+        position:absolute; left:18px; right:18px; height:8px;
+        background:
+          linear-gradient(90deg, transparent, var(--orn), transparent);
+        opacity:.65;
+      }
+      .history-frame:before{ top:10px; }
+      .history-frame:after{ bottom:10px; }
+
+      /* Заголовки с малой_caps и тонкой линией (как вики, но теплее) */
+      .hcap{ font-variant: small-caps; letter-spacing:.5px; color:#1f1e1b; }
+      .rule{ border:0; border-top:1px solid #e5dfcf; margin:.6rem 0 1rem; }
+
+      /* Дроп-кап для первого абзаца */
+      .first-par:first-letter{
+        float:left;
+        font-size:3.2rem;
+        line-height:.9;
+        padding:.2rem .5rem .1rem 0;
+        font-weight:700;
+        color:#1e1d1a;
+        font-family: Georgia, "Times New Roman", serif;
+      }
+
+      /* Боковая цитата */
+      .pullquote{
+        border-left:3px solid var(--sepia);
+        background: rgba(166,138,100,.08);
+      }
+
+      /* Вики-инфобокс */
+      .infobox th{ background:#f1ead6; font-weight:600; }
+      .infobox td, .infobox th{
+        border:1px solid #e5dfcf; padding:.45rem .6rem; vertical-align:top;
+      }
+
+      /* Лента времени */
+      .timeline{ position:relative; padding-left:1rem; }
+      .timeline:before{
+        content:""; position:absolute; left:.35rem; top:.25rem; bottom:.25rem;
+        width:2px; background:#d9d2bf;
+      }
+      .timeline-item{ position:relative; margin:0 0 .9rem 0; padding-left:1rem; }
+      .timeline-item:before{
+        content:""; position:absolute; left:-.2rem; top:.25rem;
+        width:.55rem; height:.55rem; border-radius:50%;
+        background:#8f7b58; box-shadow:0 0 0 3px #ece5d3;
+      }
+      .timeline-year{ font-weight:700; color:#5a4b34; margin-right:.35rem; }
+
+      /* Сноски */
+      .footnotes li{ margin:.35rem 0; }
+      .footnotes sup{ color:#6c5b3e; }
+
+      /* Чат: выезд/закрытие */
+      .chat-panel{ transition: transform .4s ease-in-out; }
+      .chat-panel.closed{ transform: translateX(100%); }
+
+      /* Кнопка чата поверх всего */
+      #toggleChat{ -webkit-tap-highlight-color: transparent; }
     </style>
   </head>
 
-  <body class="relative min-h-screen bg-white text-gray-900">
-    <!-- Затемнение фона -->
-    <div id="overlay"></div>
+  <body class="relative min-h-screen bg-white text-[15px] leading-7 text-gray-900">
+    <!-- Фон (мягкий, опционально можно убрать: Википедия обычно без фона) -->
+    <div class="absolute inset-0 -z-10 bg-center bg-cover bg-no-repeat opacity-[.08]"
+         style="background-image:url('./alfarabi.jpg')"></div>
 
     <!-- Кнопка чата -->
-    <button
-      id="toggleChat"
-      class="fixed bottom-24 right-6 z-50 w-14 h-14 rounded-full bg-gray-900 text-white shadow-lg hover:bg-black text-2xl flex items-center justify-center transition-transform active:scale-95"
-      aria-label="Открыть чат"
-    >
-      💬
-    </button>
+  <button id="toggleChat"
+    class="fixed bottom-24 right-6 z-50 w-14 h-14 rounded-full bg-gray-900 text-white shadow-lg hover:bg-black text-2xl flex items-center justify-center transition-transform active:scale-95"
+    aria-label="Открыть чат">💬</button>
 
-    <!-- Основной контент -->
-    <main class="mw max-w-6xl mx-auto px-4 lg:px-6 py-6">
+    <!-- Контент как у вики: слева статья, справа место под выезжающий чат -->
+    <main class="max-w-6xl mx-auto px-4 lg:px-6 py-6">
       <div class="grid grid-cols-12 gap-6">
-        <article class="col-span-12 lg:col-span-9 text-left">
-          <h1 class="text-3xl font-serif font-bold">Әбу Насыр әл-Фараби</h1>
-          <hr />
+        <!-- СТАТЬЯ -->
+        <article class="col-span-12 lg:col-span-9 text-left history-paper history-frame rounded-xl p-6">
+          <header>
+            <h1 class="text-3xl font-serif font-bold hcap">Әбу Насыр әл-Фараби</h1>
+            <hr class="rule" />
+          </header>
 
-          <!-- Инфобокс -->
-          <aside
-            class="infobox bg-white text-sm float-right w-[280px] ml-4 mb-4 rounded-md overflow-hidden"
-          >
+          <!-- Инфобокс (справа внутри статьи) -->
+          <aside class="infobox bg-[#fbf7ec] text-sm float-right w-[280px] ml-4 mb-4 rounded-md overflow-hidden">
             <table class="w-full border-collapse">
               <tbody>
-                <tr>
-                  <th colspan="2" class="text-center">Әл-Фараби</th>
-                </tr>
+                <tr><th colspan="2" class="text-center">Әл-Фараби</th></tr>
                 <tr>
                   <td colspan="2" class="p-0">
-                    <img
-                      src="./alfarabi.jpg"
-                      alt="Әл-Фараби"
-                      class="w-full h-auto block"
-                    />
+                    <img src="./alfarabi.jpg" alt="Әл-Фараби" class="w-full h-auto block">
                   </td>
                 </tr>
-                <tr>
-                  <th>Туған жылы</th>
-                  <td>870 (Фараб, Отырар өңірі)</td>
-                </tr>
-                <tr>
-                  <th>Қайтыс болған</th>
-                  <td>950 (Дамаск)</td>
-                </tr>
-                <tr>
-                  <th>Қызметі</th>
-                  <td>философ, логик, математик, музыка зерттеушісі</td>
-                </tr>
-                <tr>
-                  <th>Лақап</th>
-                  <td>«Екінші ұстаз» (Аристотельден кейін)</td>
-                </tr>
+                <tr><th>Туған жылы</th><td>870 (Отырар өңірі)</td></tr>
+                <tr><th>Қайтыс болған</th><td>950 (Дамаск)</td></tr>
+                <tr><th>Қызметі</th><td>философ, логик, математик, музыка зерттеушісі</td></tr>
+                <tr><th>Лақап</th><td>«Екінші ұстаз» (Аристотельден кейін)</td></tr>
               </tbody>
             </table>
           </aside>
 
+          <!-- Первый абзац с дропкапом -->
           <p class="first-par">
-            <strong
-              >Әбу Насыр Мұхаммед ибн Мұхаммед ибн Тархан ибн Узлағ әл-Фараби</strong
-            >
-            (870–950) — орта ғасырдағы ұлы ойшыл, философ, логик, математик және
-            музыка теоретигі. Ислам философиясының қалыптасуына ерекше үлес
-            қосып, шығыс пен батыста «Екінші ұстаз» атанған.
+            <strong>Әбу Насыр Мұхаммед ибн Мұхаммед ибн Тархан ибн Узлағ әл-Фараби</strong> (870–950) —
+            орта ғасырдағы ұлы ойшыл, философ, логик, математик және музыка теоретигі. Ислам философиясының
+            қалыптасуына ерекше үлес қосып, шығыс пен батыста «Екінші ұстаз» атанған.
           </p>
 
-          <nav
-            class="toc bg-gray-50 border border-gray-200 rounded-md p-3 my-4"
-          >
-            <div class="font-semibold mb-2">Мазмұны</div>
-            <ol class="list-decimal list-inside space-y-1 text-sm">
-              <li><a href="#life">Өмірбаяны</a></li>
-              <li><a href="#works">Еңбектері</a></li>
-              <li><a href="#ideas">Негізгі идеялары</a></li>
-              <li><a href="#legacy">Мұрасы мен ықпалы</a></li>
+          <!-- Оглавление -->
+          <nav class="bg-[#fbf7ec]/70 border border-[#e5dfcf] rounded-md p-3 my-4">
+            <div class="font-semibold hcap">Мазмұны</div>
+            <ol class="list-decimal list-inside space-y-1 text-[14px] mt-1">
+              <li><a href="#life" class="underline">Өмірбаяны</a></li>
+              <li><a href="#works" class="underline">Еңбектері</a></li>
+              <li><a href="#ideas" class="underline">Негізгі идеялары</a></li>
+              <li><a href="#timeline" class="underline">Хронология</a></li>
+              <li><a href="#legacy" class="underline">Мұрасы мен ықпалы</a></li>
+              <li><a href="#refs" class="underline">Дереккөздер</a></li>
             </ol>
           </nav>
 
-          <section id="life" class="prose max-w-none">
-            <h2 class="text-2xl font-serif font-semibold mb-2">Өмірбаяны</h2>
+          <section id="life" class="mt-4">
+            <h2 class="text-2xl font-serif font-semibold hcap">Өмірбаяны</h2>
+            <hr class="rule" />
             <p>
-              Әл-Фараби Отырар өңірінде дүниеге келіп, Бағдат, Дамаск, Алеппо
-              сияқты қалаларда білімін жетілдірді. Ол логика, философия, музыка,
-              математика, жаратылыстану мен саясаттану салаларында терең
-              зерттеулер жүргізді.
+              Әл-Фараби Отырар өңірінде дүниеге келіп, Бағдат, Дамаск, Алеппо сияқты қалаларда білімін жетілдірді.
+              Логика, философия, музыка, математика, жаратылыстану мен саясаттану салаларында терең зерттеулер жүргізді.
+            </p>
+            <p class="pullquote rounded-md p-3 mt-3 text-[14.5px]">
+              «Бақытқа жету үшін адам өзін-өзі жетілдіріп, ақыл-ой мен ізгілікке ұмтылуы тиіс.»
             </p>
           </section>
 
-          <section id="works" class="prose max-w-none mt-4">
-            <h2 class="text-2xl font-serif font-semibold mb-2">Еңбектері</h2>
+          <section id="works" class="mt-6">
+            <h2 class="text-2xl font-serif font-semibold hcap">Еңбектері</h2>
+            <hr class="rule" />
             <ul class="list-disc pl-6">
-              <li>
-                <em>«Қайырымды қала тұрғындарының көзқарастары»</em> — идеалды
-                қоғам, билік пен адам кемелдігінің үйлесімі.
-              </li>
-              <li>
-                <em>«Музыка туралы үлкен кітап»</em> — дыбыс, лад, ырғақ
-                теорияларының жүйелі талдауы.
-              </li>
-              <li>
-                Аристотель еңбектеріне түсіндірмелер — логика мен метафизикаға
-                жүйелі көзқарас.
-              </li>
+              <li><em>«Қайырымды қала тұрғындарының көзқарастары»</em> — идеалды қоғам, билік пен адам кемелдігінің үйлесімі.</li>
+              <li><em>«Музыка туралы үлкен кітап»</em> — дыбыс, лад, ырғақ теорияларының жүйелі талдауы.</li>
+              <li>Аристотель еңбектеріне түсіндірмелер — логика мен метафизикаға жүйелі көзқарас.</li>
             </ul>
           </section>
 
-          <section id="ideas" class="prose max-w-none mt-4">
-            <h2 class="text-2xl font-serif font-semibold mb-2">
-              Негізгі идеялары
-            </h2>
+          <section id="ideas" class="mt-6">
+            <h2 class="text-2xl font-serif font-semibold hcap">Негізгі идеялары</h2>
+            <hr class="rule" />
             <p>
-              Адамның бақытқа жетуі — ақыл-ой мен ізгілікті жетілдіру арқылы;
-              қоғамның кемелдігі — әділет пен білім үстемдігімен айқындалады.
-              Мемлекет басшысы — парасатты, әділ, даналықке ұмтылған тұлға
-              болуы тиіс.
+              Адамның бақытқа жетуі — ақыл-ой мен ізгілікті жетілдіру арқылы; қоғамның кемелдігі — әділет пен білім үстемдігімен.
+              Мемлекет басшысы — парасатты, әділ, даналыққа ұмтылған тұлға болуы тиіс.
             </p>
           </section>
 
-          <section id="legacy" class="prose max-w-none mt-4">
-            <h2 class="text-2xl font-serif font-semibold mb-2">
-              Мұрасы мен ықпалы
-            </h2>
+          <!-- Хронология как “исторический” элемент -->
+          <section id="timeline" class="mt-6">
+            <h2 class="text-2xl font-serif font-semibold hcap">Хронология</h2>
+            <hr class="rule" />
+            <div class="timeline mt-2">
+              <div class="timeline-item"><span class="timeline-year">870</span>Отырар өңірінде дүниеге келді.</div>
+              <div class="timeline-item"><span class="timeline-year">~900</span>Бағдатқа барып, ғылымға ден қойды.</div>
+              <div class="timeline-item"><span class="timeline-year">~940</span>Қоғам, логика, музыка туралы ірі еңбектер жазды.</div>
+              <div class="timeline-item"><span class="timeline-year">950</span>Дамаскіде дүниеден өтті.</div>
+            </div>
+          </section>
+
+          <section id="legacy" class="mt-6">
+            <h2 class="text-2xl font-serif font-semibold hcap">Мұрасы мен ықпалы</h2>
+            <hr class="rule" />
             <p>
-              Әл-Фараби мұрасы араб-мұсылман әлемінде ғана емес,
-              ортағасырлық Еуропада да ықпал етті. Оның идеялары логика,
-              саясаттану, музыка теориясы мен метафизикада жаңа бағыттарға жол
-              ашты.
+              Әл-Фараби мұрасы ислам әлемінде ғана емес, ортағасырлық Еуропада да ықпал етті. Логика, саясаттану,
+              музыка теориясы мен метафизикада жаңа бағыттарға жол ашты.
             </p>
           </section>
+
+          <section id="refs" class="mt-6">
+            <h2 class="text-2xl font-serif font-semibold hcap">Дереккөздер</h2>
+            <hr class="rule" />
+            <ol class="footnotes list-decimal pl-6 text-[14px]">
+              <li><sup>[1]</sup> Классикалық араб-парсы дереккөздері</li>
+              <li><sup>[2]</sup> Заманауи зерттеулер және аудармалар</li>
+            </ol>
+          </section>
+          <div class="clear-both"></div>
         </article>
 
+        <!-- Пустая колонка справа (под панель чата) -->
         <div class="col-span-12 lg:col-span-3"></div>
       </div>
     </main>
 
     <!-- Панель чата -->
-    <div
-      id="chatPanel"
-      class="chat-panel closed fixed top-0 right-0 h-[calc(100%-5rem)] mt-5 w-[22%] min-w-[320px] bg-white/85 backdrop-blur-md shadow-2xl border-l border-gray-200 flex flex-col z-40 rounded-tl-2xl"
-    >
-      <header
-        class="px-4 py-3 border-b flex justify-between items-center bg-white/70 backdrop-blur"
-      >
+    <div id="chatPanel"
+      class="chat-panel closed fixed top-0 right-0 h-[calc(100%-5rem)] mt-5 w-[22%] min-w-[320px] bg-white/90 backdrop-blur-md shadow-2xl border-l border-gray-200 flex flex-col z-40 rounded-tl-2xl">
+      <header class="px-4 py-3 border-b flex justify-between items-center bg-white/70 backdrop-blur">
         <h2 class="text-lg font-semibold">Чат</h2>
-        <button
-          id="clear"
-          class="text-xs px-3 py-1.5 border rounded-lg hover:bg-gray-100"
-        >
-          Жою
-        </button>
+        <button id="clear" class="text-xs px-3 py-1.5 border rounded-lg hover:bg-gray-100">Жою</button>
       </header>
       <div class="flex-1 p-3 overflow-y-auto space-y-3" id="chat"></div>
       <form id="form" class="border-t p-3 flex gap-2">
-        <input
-          id="input"
-          class="flex-1 border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-900"
-          placeholder="Сұрағыңызды жазыңыз..."
-        />
-        <button
-          class="px-4 py-2 rounded-xl bg-gray-900 text-white hover:bg-black"
-          type="submit"
-        >
-          →
-        </button>
+        <input id="input" class="flex-1 border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-900"
+               placeholder="Сұрағыңызды жазыңыз..." />
+        <button class="px-4 py-2 rounded-xl bg-gray-900 text-white hover:bg-black" type="submit">→</button>
       </form>
     </div>
 
     <script src="./app.js"></script>
     <script>
+      // Тоггл чата
       const toggleBtn = document.getElementById("toggleChat");
       const chatPanel = document.getElementById("chatPanel");
-      const overlay = document.getElementById("overlay");
-
       if (toggleBtn && chatPanel) {
         let isOpen = false;
-
-        // 🔹 Открытие/закрытие по кнопке
         toggleBtn.addEventListener("click", () => {
           isOpen = !isOpen;
-          if (isOpen) {
-            chatPanel.classList.remove("closed");
-            overlay.classList.add("visible");
-            toggleBtn.textContent = "✖";
-          } else {
-            chatPanel.classList.add("closed");
-            overlay.classList.remove("visible");
-            toggleBtn.textContent = "💬";
-          }
-        });
-
-        // 🔹 Клик по фону — закрывает чат
-        overlay.addEventListener("click", () => {
-          if (isOpen) {
-            chatPanel.classList.add("closed");
-            overlay.classList.remove("visible");
-            toggleBtn.textContent = "💬";
-            isOpen = false;
-          }
+          if (isOpen) { chatPanel.classList.remove("closed"); toggleBtn.textContent = "✖"; }
+          else { chatPanel.classList.add("closed"); toggleBtn.textContent = "💬"; }
         });
       }
     </script>
